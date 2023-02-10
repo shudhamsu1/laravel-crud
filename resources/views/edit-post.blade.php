@@ -1,7 +1,8 @@
 <x-layout>
-{{dd($post)}}
+
     <div class="container py-md-5 container--narrow">
-        <form action="/posts/{{$post->id}}" method="POST">
+        <p><small><strong><a href="/post/{{$post->id}}">&laquo; Back to post link</a></strong></small></p>
+        <form action="/post/{{$post->id}}" method="POST">
             @csrf
             @method('PUT')
             <div class="form-group">

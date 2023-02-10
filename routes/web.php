@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\DemoController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\PostController;
+use Illuminate\Support\Facades\Gate;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -20,6 +21,15 @@ use App\Http\Controllers\PostController;
 //});
 //Route::get('/',[DemoController::class, 'homepage']);
 //User related routes$
+
+//this is the using gate with only controller method
+Route::get('/admins-only', function(){
+    if(Gate::allows('visitAdminPages')){
+        return 'Only admins should be able to see this page';
+    };
+    return 'You cannot use this page';
+});
+
 Route::get('/',[UserController::class, 'showCorrectHomepage'])->name('login');
 
 Route::get('/about',[DemoController::class, 'aboutPage']);
@@ -32,11 +42,11 @@ Route::post('/logout', [UserController::class, 'logout']);
 
 Route::get('/create-post', [PostController::class, 'showCreateForm'])->name('createPost')->middleware('mustBeloggedIn');
 Route::post('/create-post', [PostController::class, 'storeNewPost'])->name('storePost')->middleware('mustBeloggedIn');
-Route::get('/post/{post}', [PostController::class, 'viewSinglePost']);
+Route::get('/post/{post}', [PostController::class, 'viewSinglePost'])->name('postPage');
 Route::delete('/post/{post}', [PostController::class, 'delete'])->middleware('can:delete,post');
 
-Route::Get('/posts/{posts}/edit', [PostController::class, 'showEditForm'])->middleware('can:update,post');
-Route::put('posts/{post}',[PostController::class, 'actuallyUpdate'])->middleware('can:update,post');
+Route::get('/post/{post}/edit', [PostController::class, 'showEditForm'])->middleware('can:update,post');
+Route::put('post/{post}',[PostController::class, 'actuallyUpdate'])->middleware('can:update,post');
 
 //Profile related routes
 Route::get('profile/{user:username}', [UserController::class, 'profile']);
