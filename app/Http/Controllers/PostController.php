@@ -7,10 +7,15 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 class PostController extends Controller
 {
+    //We can type hint the data from the database in the parameter in function below
+    public function showEditForm(PostModel $post){
+//        We need to    fetch the existing data from the databse with title and body values
+        return view('edit-post',['post'=>$post]);
+    }
     public function delete(PostModel $post){
-        if(auth()->user()->cannot('delete', $post)){
-            return 'You cannot do that';
-        }
+//        if(auth()->user()->cannot('delete', $post)){
+//            return 'You cannot do that';
+//        }
         $post->delete();
         return redirect('/profile/'. auth()->user()->username)->with('success', 'Post successfully deleted');
     }
