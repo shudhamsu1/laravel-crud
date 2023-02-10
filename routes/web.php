@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\DemoController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\PostController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -17,24 +18,23 @@ use App\Http\Controllers\UserController;
 //Route::get('/', function () {
 //    return view('homepage');
 //});
-
-Route::get('/',[DemoController::class, 'homepage']);
+//Route::get('/',[DemoController::class, 'homepage']);
+//User related routes$
+Route::get('/',[UserController::class, 'showCorrectHomepage'])->name('login');
 
 Route::get('/about',[DemoController::class, 'aboutPage']);
 
 Route::post('/register', [UserController::class, 'register']);
+Route::post('/login', [UserController::class, 'login']);
+Route::post('/logout', [UserController::class, 'logout']);
 
-//Route::controller(DemoController::class)->group(function (){
-//    Route::get('/about', 'Index')->name('about.page');
-//    Route::get('/contact',  'ContactMethod');
-//});
+//Blog post related routes
 
-//Route::get('/about', [DemoController::class, 'Index']);
-//Route::get('/contact', [DemoController::class, 'ContactMethod']);
+Route::get('/create-post', [PostController::class, 'showCreateForm'])->name('createPost')->middleware('mustBeloggedIn');
+Route::post('/create-post', [PostController::class, 'storeNewPost'])->name('storePost')->middleware('mustBeloggedIn');
+Route::get('/post/{post}', [PostController::class, 'viewSinglePost']);
+Route::delete('/post/{post}', [PostController::class, 'delete']);
 
-//
-//Route::get('/contact', function(){
-//    return view('contact');
-//});
-//Route::get('/contactme',[DemoController::class,'show']);
-.//Route::get('user/{$user}', [UserController::class, 'loadUserView']);
+//Profile related routes
+Route::get('profile/{user:username}', [UserController::class, 'profile']);
+//in the above route we want the model to be using username instead of id
