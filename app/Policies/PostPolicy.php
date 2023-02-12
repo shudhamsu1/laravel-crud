@@ -53,7 +53,7 @@ class PostPolicy
      */
     public function update(User $user, PostModel $post)
     {
-        //if the user isadmin and it returns true then we can use update and delete below
+        //if the user isadmin and it returns true then we can use update and delete below and use it in the gate
         if($user->isAdmin === 1){
             return true;
         }

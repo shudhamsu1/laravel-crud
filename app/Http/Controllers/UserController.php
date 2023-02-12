@@ -4,10 +4,54 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
+use Intervention\Image\Facades\Image;
 
 class UserController extends Controller
 {
+
+    public function storeAvatar(Request $request){
+//        $request->file('avatars')->store('public/avatars');
+        $request->validate([
+            //The request comes from the form
+            //here we are doing basic validation on the server-side.
+            'avatar' => 'required|image|max:6000'
+        ]);
+        //if the request is validated
+//        $request->file('avatar')->store('public/avatars');
+            $user = auth()->user();
+            $filename= $user->id.'-'.uniqid() . '.jpg';
+
+        //make: returns the raaw data saved
+        //below here we have used composer require intervention/image package to make the file small which can be fit in the avatar
+        //and encoded the format
+        $imgData = Image::make($request->file('avatar'))->fit(120)->encode('jpg');
+        //The imgData didnt create any file in our folers/drive, its going to give us the raw data that needs to be saved somewhere
+        Storage::put('public/avatars/'.$filename,$imgData);
+        //From the line above we are storing the image file in a specific path that we can see above
+
+        //the oldavatar is the picture which is there if there is one. It is saved here so that we can delete this once new
+        //picture has been updated
+        $oldAvatar = $user->avatar;
+
+        //the line is pointing that $user->avatar value is filename and then saving it in the database which is done by eloquent
+        $user->avatar = $filename;
+        $user->save();
+
+        //if oldavatar doesnt equal to fallback avatar then they had oldAvatar i.e. picture so we are going to delete it here
+        if($oldAvatar!="/fallback-avatar.jpg" ){
+            Storage::delete(str_replace('/storage/', "public/", $oldAvatar));
+        }
+
+        return back()->with('success', 'Congrats on the new avatar');
+
+    }
+
+
+    public function showAvatarForm(){
+        return view('avatar-form');
+    }
 //    public function loadUserView($user){
 //        return view('users',['name'=>$user]);
 //    }
@@ -19,8 +63,8 @@ class UserController extends Controller
 //        echo "<pre>";
 //        print_r($thePosts->toArray());
 //        echo "</pre>";
-
-        return view('profile-posts', ['username' =>$user->username, 'posts' => $user->posts()->latest()->get(), 'postCount'=>$user->posts()->count()]);
+            //here we passed the avatar represeting the photo from the attribute and
+        return view('profile-posts', ['avatar'=> $user->avatar,'username' =>$user->username, 'posts' => $user->posts()->latest()->get(), 'postCount'=>$user->posts()->count()]);
     }
 
 

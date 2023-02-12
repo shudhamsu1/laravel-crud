@@ -23,12 +23,16 @@ use Illuminate\Support\Facades\Gate;
 //User related routes$
 
 //this is the using gate with only controller method
-Route::get('/admins-only', function(){
-    if(Gate::allows('visitAdminPages')){
-        return 'Only admins should be able to see this page';
-    };
-    return 'You cannot use this page';
-});
+//Route::get('/admins-only', function(){
+//    if(Gate::allows('visitAdminPages')){
+//        return 'Only admins should be able to see this page';
+//    };
+//    return 'You cannot use this page';
+//});
+//here in this route we have defined gatea action in AuthServiceProvider
+Route::get('/admins-only', function() {
+    return 'Only admins should be able to see this page';
+})->middleware('can:visitAdminsPages');
 
 Route::get('/',[UserController::class, 'showCorrectHomepage'])->name('login');
 
@@ -37,6 +41,8 @@ Route::get('/about',[DemoController::class, 'aboutPage']);
 Route::post('/register', [UserController::class, 'register']);
 Route::post('/login', [UserController::class, 'login']);
 Route::post('/logout', [UserController::class, 'logout']);
+Route::get('/manage-avatar',[UserController::class, 'showAvatarForm'])->middleware('mustBeloggedIn');
+Route::post('/manage-avatar',[UserController::class, 'storeAvatar'])->middleware('mustBeloggedIn');
 
 //Blog post related routes
 
