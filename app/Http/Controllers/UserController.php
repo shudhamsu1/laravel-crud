@@ -40,7 +40,7 @@ class UserController extends Controller
         $user->save();
 
         //if oldavatar doesnt equal to fallback avatar then they had oldAvatar i.e. picture so we are going to delete it here
-        if($oldAvatar!="/fallback-avatar.jpg" ){
+        if($oldAvatar != "/fallback-avatar.jpg" ){
             Storage::delete(str_replace('/storage/', "public/", $oldAvatar));
         }
 
