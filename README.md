@@ -9,7 +9,7 @@
 
 
 
-# User Management System with Social Features #
+# User Blog Post Management System with Social Features #
 
 This project is a web-based user management system with social features, including user registration, login, logout, profile photo upload, user-to-user chat, and blog posting.live search functionality, and permission management using Laravel Gates, Policies, and Permissions. The project also includes a feature for sending automated emails from the application. It was built using php, laravel, bootstrap, Javascript and Mysql as a database.
 
