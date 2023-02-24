@@ -13,7 +13,7 @@ Laravel is a web application framework with expressive, elegant syntax. We belie
 
 Laravel is accessible, powerful, and provides tools required for large, robust applications.
 
-Features: User registration, log in, log out
-          Profile Photo Upload (server-side resize & storage)
-          You can only edit your own posts and not other people's posts
-          Users can follow each other, chat and post their blogs
+Features:- User registration, log in, log out
+          -Profile Photo Upload (server-side resize & storage)
+          -You can only edit your own posts and not other people's posts
+         - Users can follow each other, chat and post their blogs
