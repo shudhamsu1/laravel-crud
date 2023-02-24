@@ -1,7 +1,4 @@
 <x-profile :sharedData="$sharedData">
-@include('profile-posts-only');
 
-
-
-
+@include('profile-following-only')
 </x-profile>

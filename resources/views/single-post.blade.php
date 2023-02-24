@@ -9,7 +9,7 @@
         @can('update', $post)
 
         <span class="pt-2">
-          <a href="#" class="text-primary mr-2" data-toggle="tooltip" data-placement="top" title="Edit"><i class="fas fa-edit"></i></a>
+          <a href="/post/{{$post->id}}/edit" class="text-primary mr-2" data-toggle="tooltip" data-placement="top" title="Edit"><i class="fas fa-edit"></i></a>
           <form class="delete-post-form d-inline" action="/post/{{$post->id}}" method="POST">
               @csrf
               @method('DELETE')
@@ -20,8 +20,8 @@
     </div>
 
     <p class="text-muted small mb-4">
-        <a href="#"><img class="avatar-tiny" src="https://gravatar.com/avatar/f64fc44c03a8a7eb1d52502950879659?s=128" /></a>
-        Posted by <a href="#">{{$post->user->username}}</a> on {{$post->created_at->format('n/j/Y')}}
+        <a href="/profile/{{$post->user->username}}"><img class="avatar-tiny" src="{{$post->user->avatar}}" /></a>
+        Posted by <a href="/profile/{{$post->user->username}}">{{$post->user->username}}</a> on {{$post->created_at->format('n/j/Y')}}
     </p>
 
     <div class="body-content">

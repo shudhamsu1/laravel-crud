@@ -14,7 +14,9 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
     <link href="https://fonts.googleapis.com/css2?family=Source+Sans+Pro:ital,wght@0,400;0,700;1,400;1,700&display=swap"
           rel="stylesheet"/>
-    <link rel="stylesheet" href="/main.css"/>
+{{--    <link rel="stylesheet" href="/main.css"/>--}}
+    @vite(['resources/css/app.css'])
+    @vite(['resources/js/app.js'])
 </head>
 <body>
 <header class="header-bar mb-3">
@@ -29,7 +31,7 @@
                       data-placement="bottom"><i class="fas fa-comment"></i></span>
                 <a href='/profile/{{auth()->user()->username}}' class="mr-2"><img title="My Profile" data-toggle="tooltip" data-placement="bottom"
                                               style="width: 32px; height: 32px; border-radius: 16px"
-                                              src="https://gravatar.com/avatar/f64fc44c03a8a7eb1d52502950879659?s=128"/></a>
+                                              src="{{auth()->user()->avatar}}"></a>
                 <a class="btn btn-sm btn-success mr-2" href="{{route('createPost')}}">Create Post</a>
                 <form action="/logout" method="POST" class="d-inline">
                     @csrf
@@ -81,6 +83,9 @@
 <footer class="border-top text-center small text-muted py-3">
     <p class="m-0">Copyright &copy; {{date('Y')}} <a href="/" class="text-muted">OurApp</a>. All rights reserved.</p>
 </footer>
+@auth
+    <div data-username="{{auth()->user()->username}}" data-avatar="{{auth()->user()->avatar}}" id="chat-wrapper" class="chat-wrapper shadow border-top border-left border-right" ></div>
+@endauth
 
 <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
         integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
