@@ -2,9 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\OurExampleEvent;
+use App\Models\Follow;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\View;
 use Illuminate\Validation\Rule;
 use Intervention\Image\Facades\Image;
 
@@ -56,21 +59,64 @@ class UserController extends Controller
 //        return view('users',['name'=>$user]);
 //    }
 //here in the parameter the User is the instance of the model user
-    public function profile(User $user){
+    private function getSharedData($user){
+        $currentlyFollowing = 0;
 
+        if(auth()->check()){
+            $currentlyFollowing = Follow::where([['user_id', '=', auth()->user()->id],['followeduser','=', $user->id]])->count();
+            //if the currently following equals to 1 then this will be rendered in the profile showing remove following, since they are already followed
+        }
         //the posts() function is from Usermodel where the relationship is user can post many posts
 //        $thePosts = $pizza->posts()->get();
 //        echo "<pre>";
 //        print_r($thePosts->toArray());
 //        echo "</pre>";
-            //here we passed the avatar represeting the photo from the attribute and
-        return view('profile-posts', ['avatar'=> $user->avatar,'username' =>$user->username, 'posts' => $user->posts()->latest()->get(), 'postCount'=>$user->posts()->count()]);
+        //here we passed the avatar represeting the photo from the attribute and
+        View::share('sharedData', ['currentlyFollowing'=> $currentlyFollowing, 'avatar'=> $user->avatar,
+            'username' =>$user->username, 'postCount'=>$user->posts()->count(),
+            'followerCount'=>$user->followers()->count(), 'followingCount'=> $user->followingTheseUsers()->count()]);
+        // can share a variable and available in the share templates
+
+    }
+
+    public function profile(User $user){
+        $this->getSharedData($user);
+        return view('profile-posts', [ 'posts' => $user->posts()->latest()->get()]);
+    }
+
+    public function profileRaw(User $user){
+        //here the render will just send text
+        return response()->json(['theHTML'=> view('profile-posts-only',['posts' => $user->posts()->latest()->get()])->render(),
+            'docTitle' => $user->username. "'s Profile"]);
+    }
+
+    public function profileFollowers(User $user){
+        $this->getSharedData($user);
+//         $user->followers()->latest()->get();
+
+        return view('profile-followers', [ 'followers' => $user->followers()->latest()->get()]);
+    }
+    public function profileFollowersRaw(User $user){
+        return response()->json(['theHTML'=> view('profile-followers-only',['followers' => $user->followers()->get()])->render(),
+            'docTitle' => $user->username. "'s Followers"]);
+            }
+
+    public function profileFollowing(User $user){
+        $this->getSharedData($user);
+
+        return view('profile-following', ['following' => $user->followingTheseUsers()->latest()->get()]);
+    }
+
+    public function profileFollowingRaw(User $user){
+        return response()->json(['theHTML'=> view('profile-following-only',['following' => $user->followingTheseUsers()->get()])->render(),
+            'docTitle' => 'who '. $user->username. " Follows"]);
     }
 
 
 
-
     public function logout(){
+
+        event(new OurExampleEvent(['username'=> auth()->User()->username, 'action'=>'logout']));
         auth()->logout();
         return redirect('/')->with('success', 'You are now logged out.');
 
@@ -78,11 +124,26 @@ class UserController extends Controller
 
     public function showCorrectHomepage(){
         if(auth()->check()){
-            return view('homepage-feed');
+            return view('homepage-feed',['posts' => auth()->user()->feedposts()->latest()->paginate(4)]);
 
         }else {
             return view('homepage');
         }
+    }
+
+    public function loginApi(Request $request){
+        $incomingFields = $request->validate([
+            'username' => 'required',
+            'password' => 'required'
+        ]);
+        //this will only run true if it is a valid username and pw
+        if(auth()->attempt($incomingFields)){
+            //
+            $user = User::where('username', $incomingFields['username'])->first();
+            $token = $user->createToken('ourapptoken')->plainTextToken;
+            return $token;
+        }
+        return 'sorry';
     }
 
     public function login(Request $request){
@@ -94,7 +155,8 @@ class UserController extends Controller
         //here we are creating the associative array of the incomingfield above
         if(auth()->attempt(['username'=>$incomingField['loginusername'], 'password'=>$incomingField['loginpassword']])){
             $request->session()->regenerate();
-//            return "Congrats";
+            event(new OurExampleEvent(['username'=> auth()->user()->username, 'action'=>'login']));
+            //            return "Congrats";
             return redirect('/')->with('success', 'You have successfully loggged in.');
         }else{
             return redirect('/')->with('failure', 'Invalid login');

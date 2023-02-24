@@ -51,8 +51,24 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+    public function feedPosts(){
+        return $this->hasManyThrough(PostModel::class,Follow::class,'user_id','user_id','id','followeduser');
+    }
 
     public function posts(){
         return $this->hasMany(PostModel::class, 'user_id');
     }
+    //user followers :who is following this user
+    public function followers(){
+        return $this->hasMany(Follow::class,'followeduser');
+    }
+
+
+//users following
+    public function followingTheseUsers(){
+        return $this->hasMany(Follow::class,'user_id');
+        //from this we can find out who the users is following
+    }
+
+
 }
